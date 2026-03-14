@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Career Quiz — Qingdao Agricultural University</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f4f0e8;
+    --ink: #1a1612;
+    --muted: #9a9080;
+    --border: #ddd8cc;
+    --accent: #e8401c;
+    --card-bg: #ffffff;
+    --radius: 4px;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 20px 60px;
+  }
+
+  /* ── HEADER BAR ── */
+  .topbar {
+    position: fixed; top: 0; left: 0; right: 0;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 32px;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    z-index: 100;
+  }
+  .topbar-logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800; font-size: 13px;
+    letter-spacing: 0.05em; text-transform: uppercase;
+    color: var(--ink);
+  }
+  .topbar-tag {
+    font-size: 11px; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--muted);
+  }
+
+  /* ── SCREENS ── */
+  .screen {
+    display: none; width: 100%; max-width: 700px;
+    margin-top: 60px;
+    animation: fadeUp 0.4s ease both;
+  }
+  .screen.active { display: block; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── INTRO ── */
+  .intro-eyebrow {
+    font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 28px; font-weight: 500;
+  }
+  .intro-title {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(48px, 9vw, 82px);
+    font-weight: 800; line-height: 0.95;
+    letter-spacing: -0.03em;
+    margin-bottom: 32px;
+  }
+  .intro-title em { font-style: italic; font-weight: 400; color: var(--accent); }
+  .intro-body {
+    font-size: 17px; line-height: 1.75;
+    color: #5a5448; max-width: 460px;
+    margin-bottom: 48px;
+  }
+  .btn-primary {
+    display: inline-block;
+    background: var(--ink); color: var(--bg);
+    font-family: 'Syne', sans-serif;
+    font-weight: 700; font-size: 13px;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 16px 44px; border: none;
+    cursor: pointer; transition: all 0.2s;
+    border-radius: var(--radius);
+  }
+  .btn-primary:hover { background: var(--accent); transform: translateY(-2px); }
+
+  .intro-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 8px; margin-top: 56px;
+  }
+  .intro-chip {
+    padding: 8px 10px; font-size: 10px;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    border: 1px solid var(--border); color: var(--muted);
+    border-radius: var(--radius); text-align: center;
+    background: white;
+  }
+
+  /* ── PROGRESS ── */
+  .progress-wrap { margin-bottom: 44px; }
+  .progress-meta {
+    display: flex; justify-content: space-between;
+    font-size: 11px; letter-spacing: 0.15em;
+    text-transform: uppercase; margin-bottom: 10px;
+  }
+  .progress-meta span:first-child { color: var(--accent); font-weight: 500; }
+  .progress-meta span:last-child { color: var(--muted); }
+  .progress-bar {
+    height: 2px; background: var(--border); position: relative; border-radius: 2px;
+  }
+  .progress-fill {
+    position: absolute; left: 0; top: 0; height: 100%;
+    background: var(--accent); border-radius: 2px;
+    transition: width 0.5s cubic-bezier(.4,0,.2,1);
+  }
+
+  /* ── QUESTION ── */
+  .question-text {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(22px, 4.5vw, 34px);
+    font-weight: 700; line-height: 1.2;
+    letter-spacing: -0.02em; margin-bottom: 36px;
+  }
+
+  .options { display: flex; flex-direction: column; gap: 10px; }
+
+  .option {
+    display: flex; align-items: center; gap: 18px;
+    padding: 18px 22px;
+    background: white; border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    cursor: pointer; transition: all 0.2s;
+    font-size: 15px; line-height: 1.5;
+    text-align: left; width: 100%;
+    font-family: 'DM Sans', sans-serif; font-weight: 300;
+    color: var(--ink);
+  }
+  .option:hover { border-color: var(--ink); background: #faf8f4; }
+  .option.selected {
+    background: var(--ink); color: white;
+    border-color: var(--ink);
+  }
+  .option.dimmed { opacity: 0.25; pointer-events: none; }
+
+  .option-letter {
+    font-family: 'Syne', sans-serif;
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--muted); min-width: 18px;
+    transition: color 0.2s;
+  }
+  .option.selected .option-letter { color: rgba(255,255,255,0.5); }
+
+  /* ── RESULTS ── */
+  .results-header { text-align: center; margin-bottom: 52px; }
+  .results-eyebrow {
+    font-size: 11px; letter-spacing: 0.3em;
+    text-transform: uppercase; color: var(--accent);
+    font-weight: 500; margin-bottom: 16px;
+  }
+  .results-title {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(32px, 6vw, 52px);
+    font-weight: 800; line-height: 1;
+    letter-spacing: -0.03em;
+  }
+
+  .career-cards { display: flex; flex-direction: column; gap: 16px; }
+
+  .career-card {
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: 1.5px solid var(--border);
+    background: white;
+    opacity: 0; transform: translateY(16px);
+    transition: opacity 0.45s ease, transform 0.45s ease;
+  }
+  .career-card.revealed { opacity: 1; transform: translateY(0); }
+
+  .career-card-top {
+    display: flex; align-items: stretch;
+  }
+  .career-color-bar {
+    width: 6px; flex-shrink: 0;
+  }
+  .career-card-body {
+    padding: 24px 24px 20px; flex: 1;
+  }
+  .career-card-header {
+    display: flex; align-items: flex-start;
+    justify-content: space-between; gap: 16px;
+    margin-bottom: 10px;
+  }
+  .career-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px; font-weight: 800;
+    letter-spacing: -0.02em; line-height: 1.1;
+  }
+  .career-rank {
+    font-size: 10px; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--muted);
+    padding: 4px 10px; border: 1px solid var(--border);
+    border-radius: 20px; white-space: nowrap;
+    flex-shrink: 0; margin-top: 4px;
+  }
+  .career-rank.top { background: var(--ink); color: white; border-color: var(--ink); }
+
+  .career-emoji { font-size: 32px; margin-bottom: 10px; display: block; }
+
+  .career-desc {
+    font-size: 14px; color: #6a6054; line-height: 1.7;
+    margin-bottom: 16px;
+  }
+  .career-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .career-tag {
+    font-size: 10px; letter-spacing: 0.08em;
+    text-transform: uppercase; padding: 4px 10px;
+    border: 1px solid var(--border); color: var(--muted);
+    border-radius: 20px; background: var(--bg);
+  }
+
+  .retake-wrap { text-align: center; margin-top: 44px; }
+  .btn-outline {
+    background: transparent; color: var(--ink);
+    border: 1.5px solid var(--ink);
+    font-family: 'Syne', sans-serif; font-weight: 700;
+    font-size: 12px; letter-spacing: 0.12em;
+    text-transform: uppercase; padding: 13px 36px;
+    cursor: pointer; border-radius: var(--radius);
+    transition: all 0.2s;
+  }
+  .btn-outline:hover { background: var(--ink); color: white; }
+
+  @media (max-width: 500px) {
+    .intro-grid { grid-template-columns: repeat(2, 1fr); }
+    .topbar-tag { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-logo">青岛农业大学 · QAU</div>
+  <div class="topbar-tag">Career Discovery Quiz</div>
+</div>
+
+<!-- INTRO -->
+<div class="screen active" id="screen-intro">
+  <div class="intro-eyebrow">Qingdao Agricultural University</div>
+  <h1 class="intro-title">Find your<br><em>future</em><br>career.</h1>
+  <p class="intro-body">Answer 8 short questions. We will suggest three careers that match your personality, interests, and strengths.</p>
+  <button class="btn-primary" onclick="startQuiz()">Start Quiz →</button>
+  <div class="intro-grid">
+    <div class="intro-chip">Game Designer</div>
+    <div class="intro-chip">Food Scientist</div>
+    <div class="intro-chip">Urban Planner</div>
+    <div class="intro-chip">AI Researcher</div>
+    <div class="intro-chip">Film Director</div>
+    <div class="intro-chip">UX Designer</div>
+    <div class="intro-chip">Vet</div>
+    <div class="intro-chip">Entrepreneur</div>
+    <div class="intro-chip">Architect</div>
+    <div class="intro-chip">Data Scientist</div>
+    <div class="intro-chip">Journalist</div>
+    <div class="intro-chip">Doctor</div>
+  </div>
+</div>
+
+<!-- QUIZ -->
+<div class="screen" id="screen-quiz">
+  <div class="progress-wrap">
+    <div class="progress-meta">
+      <span id="q-label">Question 1</span>
+      <span id="q-count">1 / 8</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+  </div>
+  <div class="question-text" id="question-text"></div>
+  <div class="options" id="options-list"></div>
+</div>
+
+<!-- RESULTS -->
+<div class="screen" id="screen-results">
+  <div class="results-header">
+    <div class="results-eyebrow">Your Results</div>
+    <h2 class="results-title">Your top three<br>career matches.</h2>
+  </div>
+  <div class="career-cards" id="career-cards"></div>
+  <div class="retake-wrap">
+    <button class="btn-outline" onclick="restartQuiz()">Retake Quiz</button>
+  </div>
+</div>
+
+<script>
+const questions = [
+  {
+    q: "When you have free time, you most enjoy...",
+    options: [
+      { text: "Playing or making games, apps, or creative projects", traits: { creative: 3, technical: 1 } },
+      { text: "Reading, researching, or learning something new", traits: { analytical: 3, scientific: 1 } },
+      { text: "Spending time with people or helping someone out", traits: { social: 3, empathy: 1 } },
+      { text: "Being outside in nature or working with animals", traits: { nature: 3, empathy: 1 } },
+    ]
+  },
+  {
+    q: "In a group, you are usually the person who...",
+    options: [
+      { text: "Comes up with new ideas and creative solutions", traits: { creative: 3, leadership: 1 } },
+      { text: "Organises everyone and keeps things on track", traits: { leadership: 3, analytical: 1 } },
+      { text: "Makes sure everyone feels included and heard", traits: { empathy: 3, social: 2 } },
+      { text: "Thinks carefully and spots problems before they happen", traits: { analytical: 3, technical: 1 } },
+    ]
+  },
+  {
+    q: "Which subject do you enjoy most?",
+    options: [
+      { text: "Art, design, film, or literature", traits: { creative: 3, empathy: 1 } },
+      { text: "Biology, chemistry, or environmental science", traits: { scientific: 3, nature: 2 } },
+      { text: "Maths, computing, or physics", traits: { technical: 3, analytical: 2 } },
+      { text: "History, politics, languages, or economics", traits: { social: 2, leadership: 2, analytical: 1 } },
+    ]
+  },
+  {
+    q: "What kind of problem do you most want to solve?",
+    options: [
+      { text: "Climate change and protecting the environment", traits: { nature: 3, scientific: 2 } },
+      { text: "Making technology smarter and more useful", traits: { technical: 3, analytical: 2 } },
+      { text: "Helping people live healthier, happier lives", traits: { empathy: 3, social: 2 } },
+      { text: "Making cities, spaces, and systems work better", traits: { creative: 2, analytical: 2, leadership: 1 } },
+    ]
+  },
+  {
+    q: "Your ideal working day looks like...",
+    options: [
+      { text: "Creating something visual, written, or interactive", traits: { creative: 3, technical: 1 } },
+      { text: "Doing research, experiments, or analysis", traits: { scientific: 3, analytical: 2 } },
+      { text: "Meeting people, having discussions, making decisions", traits: { leadership: 3, social: 2 } },
+      { text: "Working outdoors or with living things", traits: { nature: 3, scientific: 1 } },
+    ]
+  },
+  {
+    q: "When you finish a project, you feel most proud when...",
+    options: [
+      { text: "It looks great and people find it exciting", traits: { creative: 3, social: 1 } },
+      { text: "It actually helped someone or made a difference", traits: { empathy: 3, social: 2 } },
+      { text: "It worked perfectly and solved a hard problem", traits: { technical: 3, analytical: 2 } },
+      { text: "It changed how people think about something", traits: { leadership: 2, analytical: 2, social: 1 } },
+    ]
+  },
+  {
+    q: "Which of these sounds most like your dream job?",
+    options: [
+      { text: "Designing worlds, characters, or experiences", traits: { creative: 3, technical: 1 } },
+      { text: "Discovering new things through science or research", traits: { scientific: 3, analytical: 2 } },
+      { text: "Leading a team or running your own business", traits: { leadership: 3, social: 1 } },
+      { text: "Working with animals, plants, or the natural world", traits: { nature: 3, scientific: 1 } },
+    ]
+  },
+  {
+    q: "When learning something new, you prefer to...",
+    options: [
+      { text: "Jump in and learn by experimenting", traits: { technical: 2, creative: 2 } },
+      { text: "Read about it carefully and understand the theory first", traits: { analytical: 3, scientific: 1 } },
+      { text: "Watch someone else do it, then try yourself", traits: { empathy: 1, social: 2, nature: 1 } },
+      { text: "Discuss it with others and share ideas", traits: { social: 3, leadership: 1 } },
+    ]
+  },
+];
+
+const careers = [
+  {
+    name: "Game Designer",
+    emoji: "🎮",
+    color: "#e8401c",
+    desc: "You build worlds, characters, and stories that people play. Game design mixes creativity, technology, and psychology to create experiences that are fun and memorable.",
+    tags: ["Video games", "App design", "Storytelling", "3D art"],
+    traits: { creative: 2, technical: 1 },
+  },
+  {
+    name: "Environmental Scientist",
+    emoji: "🌿",
+    color: "#2d9e5f",
+    desc: "You study how the natural world works and find ways to protect it. This career is important for solving climate change and keeping our planet healthy.",
+    tags: ["Ecology", "Climate research", "Conservation", "Field work"],
+    traits: { nature: 2, scientific: 1 },
+  },
+  {
+    name: "AI / Software Engineer",
+    emoji: "🤖",
+    color: "#3b6fe8",
+    desc: "You build intelligent systems and software that power the modern world. From apps to machine learning, this career puts you at the edge of what technology can do.",
+    tags: ["Machine learning", "App development", "Data systems", "Research"],
+    traits: { technical: 2, analytical: 1 },
+  },
+  {
+    name: "Doctor / Nurse",
+    emoji: "🩺",
+    color: "#e84c8a",
+    desc: "You help people stay healthy and recover from illness. Medicine combines science with genuine care for people, and offers a career with clear purpose every day.",
+    tags: ["Medicine", "Surgery", "Nursing", "Public health"],
+    traits: { empathy: 2, scientific: 1 },
+  },
+  {
+    name: "Film Director / Animator",
+    emoji: "🎬",
+    color: "#c44bdb",
+    desc: "You tell stories through moving images. Directors and animators shape how people feel, think, and see the world — through cinema, TV, games, and online content.",
+    tags: ["Filmmaking", "Animation", "Screenwriting", "Visual effects"],
+    traits: { creative: 2, empathy: 1 },
+  },
+  {
+    name: "Urban Planner / Architect",
+    emoji: "🏙️",
+    color: "#e87c1c",
+    desc: "You design the places where people live, work, and move around. Urban planners and architects shape cities to be safer, greener, and better for everyone.",
+    tags: ["Architecture", "City planning", "Sustainability", "Infrastructure"],
+    traits: { creative: 1, analytical: 1, leadership: 1 },
+  },
+  {
+    name: "UX / Product Designer",
+    emoji: "🎨",
+    color: "#1c8ae8",
+    desc: "You design apps, websites, and digital products that are easy and enjoyable to use. UX designers research how people think and behave, then create interfaces that just make sense.",
+    tags: ["App design", "User research", "Prototyping", "Interaction design"],
+    traits: { creative: 1, empathy: 1, social: 1 },
+  },
+  {
+    name: "Veterinarian",
+    emoji: "🐾",
+    color: "#2dbb8a",
+    desc: "You care for the health of animals — from pets to farm animals to wildlife. Vets combine science with compassion and can work in clinics, farms, zoos, or research.",
+    tags: ["Animal medicine", "Wildlife", "Farm animals", "Research"],
+    traits: { nature: 2, empathy: 1 },
+  },
+  {
+    name: "Food Scientist",
+    emoji: "🧪",
+    color: "#e8c81c",
+    desc: "You use science to improve how food is grown, made, and kept safe. Given China's agricultural strength, food science is a fast-growing field with global demand.",
+    tags: ["Food safety", "Nutrition", "Agricultural research", "Product development"],
+    traits: { scientific: 2, nature: 1 },
+  },
+  {
+    name: "Data Scientist",
+    emoji: "📊",
+    color: "#6b4de8",
+    desc: "You find patterns in large amounts of data and help organisations make better decisions. Data science is one of the most in-demand skills in almost every industry.",
+    tags: ["Statistics", "Machine learning", "Business analytics", "Research"],
+    traits: { analytical: 2, technical: 1 },
+  },
+  {
+    name: "Journalist / Content Creator",
+    emoji: "✍️",
+    color: "#e84040",
+    desc: "You share stories, ideas, and information with the world. Modern journalists and creators work across video, social media, podcasts, and writing to inform and inspire people.",
+    tags: ["Reporting", "Video content", "Social media", "Investigative work"],
+    traits: { social: 1, creative: 1, empathy: 1 },
+  },
+  {
+    name: "Entrepreneur / Business Founder",
+    emoji: "🚀",
+    color: "#e8601c",
+    desc: "You build something from nothing. Entrepreneurs spot problems, come up with solutions, and create businesses or organisations that make a real difference.",
+    tags: ["Startups", "Social enterprise", "Product development", "Leadership"],
+    traits: { leadership: 2, creative: 1 },
+  },
+];
+
+let current = 0;
+let answers = [];
+
+function startQuiz() {
+  showScreen('screen-quiz');
+  renderQuestion();
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const el = document.getElementById(id);
+  el.classList.add('active');
+  // Re-trigger animation
+  el.style.animation = 'none';
+  el.offsetHeight;
+  el.style.animation = '';
+}
+
+function renderQuestion() {
+  const q = questions[current];
+  document.getElementById('q-label').textContent = `Question ${current + 1}`;
+  document.getElementById('q-count').textContent = `${current + 1} / ${questions.length}`;
+  document.getElementById('progress-fill').style.width = `${(current / questions.length) * 100}%`;
+  document.getElementById('question-text').textContent = q.q;
+
+  const list = document.getElementById('options-list');
+  list.innerHTML = '';
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    btn.innerHTML = `<span class="option-letter">${String.fromCharCode(65+i)}</span>${opt.text}`;
+    btn.onclick = () => selectOption(opt, btn);
+    list.appendChild(btn);
+  });
+}
+
+function selectOption(opt, btn) {
+  if (document.querySelector('.option.selected')) return;
+  btn.classList.add('selected');
+  document.querySelectorAll('.option').forEach(b => { if (b !== btn) b.classList.add('dimmed'); });
+
+  setTimeout(() => {
+    answers.push(opt);
+    current++;
+    if (current < questions.length) {
+      renderQuestion();
+    } else {
+      showResults();
+    }
+  }, 420);
+}
+
+function showResults() {
+  const scores = {};
+  answers.forEach(a => {
+    Object.entries(a.traits).forEach(([t, v]) => { scores[t] = (scores[t] || 0) + v; });
+  });
+
+  const ranked = careers.map(c => ({
+    ...c,
+    score: Object.entries(c.traits).reduce((sum, [t, w]) => sum + (scores[t] || 0) * w, 0)
+  })).sort((a, b) => b.score - a.score).slice(0, 3);
+
+  const container = document.getElementById('career-cards');
+  container.innerHTML = '';
+
+  ranked.forEach((career, i) => {
+    const card = document.createElement('div');
+    card.className = 'career-card';
+    card.innerHTML = `
+      <div class="career-card-top">
+        <div class="career-color-bar" style="background:${career.color}"></div>
+        <div class="career-card-body">
+          <span class="career-emoji">${career.emoji}</span>
+          <div class="career-card-header">
+            <div class="career-name">${career.name}</div>
+            <div class="career-rank ${i === 0 ? 'top' : ''}">${i === 0 ? '★ Best Match' : `#${i+1} Match`}</div>
+          </div>
+          <p class="career-desc">${career.desc}</p>
+          <div class="career-tags">${career.tags.map(t => `<span class="career-tag">${t}</span>`).join('')}</div>
+        </div>
+      </div>
+    `;
+    container.appendChild(card);
+    setTimeout(() => card.classList.add('revealed'), 200 + i * 300);
+  });
+
+  showScreen('screen-results');
+}
+
+function restartQuiz() {
+  current = 0;
+  answers = [];
+  showScreen('screen-intro');
+}
+</script>
+</body>
+</html>
